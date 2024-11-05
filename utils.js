@@ -28,6 +28,9 @@ const utilsScope = () => {
   }
   
   const $dataCaller = async (method, route, data = {}, _headers = {}) => {
+    return {
+      hello: "world",
+    };
     // `data` is only used for POST,PUT request
     // `_headers` will be added to the request headers
     // The token should be used from the taskMetaData.apiData.token.
