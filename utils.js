@@ -45,6 +45,11 @@ const utilsScope = () => {
       return response.data;
     } catch (error) {
       console.error(error);
+      return {
+        __error__: error.message,
+        success: false,
+        status: 0
+      };
     }
   }
   
