@@ -50,9 +50,6 @@ const execute_PETH_Master_runTask = async (data) => {
 }
 
 const runTask = async (taskMetaData) => {
-  return {
-    success: true,
-  };
   try {
     /* taskMetaData : {
       runAndWait, // Boolean
