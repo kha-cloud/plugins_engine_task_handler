@@ -127,11 +127,11 @@ const runTask = async (taskMetaData) => {
       data: "Hello World",
       wish: "Jannah",
       taskMetaData,
-      testAPI: (await utils.$dataCaller(
-        "get",
-        "/api/plugin_api/"+taskMetaData.apiData.pluginKey+"/testzz"
-        // "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
-      )) || "Failed to call API",
+      // testAPI: (await utils.$dataCaller(
+      //   "get",
+      //   "/api/plugin_api/"+taskMetaData.apiData.pluginKey+"/testzz"
+      //   // "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
+      // )) || "Failed to call API",
     };
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
