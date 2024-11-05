@@ -24,7 +24,7 @@ const utilsScope = () => {
     fs.writeFileSync(filePath, JSON.stringify(data));
   }
   
-  const dataCaller = async (method, route, data = {}, _headers = {}) => {
+  const $dataCaller = async (method, route, data = {}, _headers = {}) => {
     // `data` is only used for POST,PUT request
     // `_headers` will be added to the request headers
     // The token should be used from the taskMetaData.apiData.token.
@@ -64,7 +64,7 @@ const utilsScope = () => {
     init,
     loadJsonFile,
     writeJsonFile,
-    dataCaller,
+    $dataCaller,
     downloadFileToPath,
     extractTarFile,
   };
