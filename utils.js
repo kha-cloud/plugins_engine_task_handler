@@ -1,4 +1,7 @@
 const fs = require("fs");
+const axios = require("axios");
+const fetch = require("node-fetch");
+
 const utilsScope = () => {
   var initialized = false;
   var taskMetaData = {};

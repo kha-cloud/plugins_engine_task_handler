@@ -8,5 +8,7 @@
   },
   "author": "Khalil ben zineb",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "axios": "^1.7.7"
+  }
 }
