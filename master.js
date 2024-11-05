@@ -135,6 +135,17 @@ const runTask = async (taskMetaData) => {
     };
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
+    setTimeout(() => {
+      utils.setCache(
+        "PETH-TEST-CACHE-KEY",
+        {
+          ...finalResult,
+          time: new Date().getTime(),
+          SML: true
+        },
+        { group: "tasks-results-by-date-" + (new Date()).toISOString().slice(0, 10), }
+      );
+    })
     // Updating the task result WITHOUT WAITING
     utils.setCache(
       key,
