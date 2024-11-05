@@ -4,6 +4,8 @@ const utils = require("./utils");
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
+const testLogFile = "/root/test.log";
+
 const execute_PETH_Master_runTask = async (data) => {
   return new Promise((resolve, reject) => {
     const _data = JSON.stringify(data);
@@ -51,6 +53,15 @@ const execute_PETH_Master_runTask = async (data) => {
 
 const runTask = async (taskMetaData) => {
   try {
+    // Clear the test log file
+    fs.writeFileSync(testLogFile, "");
+
+    const testLog = (data) => {
+      fs.appendFileSync(testLogFile, data + "\n");
+    }
+
+    testLog("testLog 1");
+    
     /* taskMetaData : {
       runAndWait, // Boolean
       taskKey,
@@ -71,6 +82,7 @@ const runTask = async (taskMetaData) => {
     }*/
   
     await utils.init(taskMetaData);
+    testLog("init done");
   
     // // Check the cache if the task's code got an update
     // const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
@@ -146,12 +158,14 @@ const runTask = async (taskMetaData) => {
       { group: "tasks-results-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
     // })
+    testLog("cacheTestResult done");
     // Updating the task result WITHOUT WAITING
     utils.setCache(
       key,
       finalResult,
       { group: "tasks-results-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
+    testLog("key done");
     const stateKey = "plugins-engine-task-state-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
     // Updating the task state WITHOUT WAITING
     utils.setCache(
@@ -159,6 +173,7 @@ const runTask = async (taskMetaData) => {
       "finished",
       { group: "tasks-states-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
+    testLog("stateKey done");
   
     return {
       ...finalResult,
