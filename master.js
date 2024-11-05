@@ -160,6 +160,11 @@ const runTask = async (taskMetaData) => {
       { group: "tasks-states-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
   
+    return {
+      ...finalResult,
+      cacheTestResult
+    };
+  
     return finalResult;
   } catch (error) {
     return {
