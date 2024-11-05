@@ -56,6 +56,17 @@ const utilsScope = () => {
     }
   }
   
+  const getCache = (key) => {
+    return $dataCaller("get", `/api/peth/get_cache/${key}`);
+  }
+  
+  const setCache = (key, value, cacheData) => {
+    return $dataCaller("post", `/api/peth/set_cache/${key}`, {
+      value,
+      cacheData
+    });
+  }
+  
   const downloadFileToPath = async (fileUrl, filePath) => {
     try {
       const response = await fetch(fileUrl);
@@ -74,6 +85,8 @@ const utilsScope = () => {
     loadJsonFile,
     writeJsonFile,
     $dataCaller,
+    getCache,
+    setCache,
     downloadFileToPath,
     extractTarFile,
   };
