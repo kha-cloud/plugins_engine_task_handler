@@ -143,6 +143,7 @@ const runTask = async (taskMetaData) => {
     return {
       success: false,
       error: error.message,
+      taskMetaData,
       __ERROR__: "Error running task"
     };
   }

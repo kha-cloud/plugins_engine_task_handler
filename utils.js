@@ -3,8 +3,8 @@ const utilsScope = () => {
   var initialized = false;
   var taskMetaData = {};
 
-  const init = async (taskMetaData) => {
-    taskMetaData = taskMetaData;
+  const init = async (_taskMetaData) => {
+    taskMetaData = _taskMetaData;
     initialized = true;
   }
 
