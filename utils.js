@@ -35,9 +35,10 @@ const utilsScope = () => {
       ..._headers
     };
     try {
+      const baseUrl = "https://" + taskMetaData.apiData.host;
       const response = await axios({
         method,
-        url: `https://api.${route}`,
+        url: baseUrl + route,
         data,
         headers
       });
