@@ -126,6 +126,7 @@ const runTask = async (taskMetaData) => {
       counter: 0,
       data: "Hello World",
       wish: "Jannah",
+      taskMetaData,
       testAPI: (await utils.$dataCaller(
         "get",
         "/api/plugin_api/"+taskMetaData.apiData.pluginKey+"/testzz"
