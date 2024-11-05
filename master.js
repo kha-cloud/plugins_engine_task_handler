@@ -141,7 +141,7 @@ const runTask = async (taskMetaData) => {
       { group: "tasks-results-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
     const stateKey = "plugins-engine-task-state-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
-    await utils.setCache(
+    utils.setCache(
       stateKey,
       "finished",
       { group: "tasks-states-by-date-" + (new Date()).toISOString().slice(0, 10), }
