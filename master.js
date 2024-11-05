@@ -141,7 +141,7 @@ const runTask = async (taskMetaData) => {
       {
         ...finalResult,
         time: new Date().getTime(),
-        SML: true
+        SML: 10
       },
       { group: "tasks-results-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
