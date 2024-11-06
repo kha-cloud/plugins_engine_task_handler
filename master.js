@@ -4,8 +4,6 @@ const utils = require("./utils");
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
-const testLogFile = "/root/test.log";
-
 const execute_PETH_Master_runTask = async (data) => {
   return new Promise((resolve, reject) => {
     const _data = JSON.stringify(data);
@@ -53,15 +51,6 @@ const execute_PETH_Master_runTask = async (data) => {
 
 const runTask = async (taskMetaData) => {
   try {
-    // Clear the test log file
-    fs.writeFileSync(testLogFile, "");
-
-    const testLog = (data) => {
-      fs.appendFileSync(testLogFile, data + "\n");
-    }
-
-    testLog("testLog 1");
-    
     /* taskMetaData : {
       runAndWait, // Boolean
       taskKey,
@@ -82,46 +71,45 @@ const runTask = async (taskMetaData) => {
     }*/
   
     await utils.init(taskMetaData);
-    testLog("init done");
   
-    // // Check the cache if the task's code got an update
-    // const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
-    // var taskCacheData = await utils.loadJsonFile(taskCacheFilePath, {
-    //   taskCodeUpdateCacheKey: null,
-    //   tarFiles: [],
-    // });
+    // Check the cache if the task's code got an update
+    const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
+    var taskCacheData = await utils.loadJsonFile(taskCacheFilePath, {
+      taskCodeUpdateCacheKey: null,
+      tarFiles: [],
+    });
   
-    // if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
-    //   // Get the Task's taskChunksUrls
-    //   const taskChunksUrls = await utils.$dataCaller(
-    //     "get",
-    //     "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
-    //   );
+    if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
+      // Get the Task's taskChunksUrls
+      const taskChunksUrls = await utils.$dataCaller(
+        "get",
+        "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
+      );
       
-    //   // Download the task's code as a TAR file and set the new version locally
-    //   const downloadPromises = [];
-    //   const tarFiles = [];
-    //   for(let i = 0; i < taskChunksUrls.length; i++) {
-    //     const taskChunkUrl = taskChunksUrls[i];
-    //     const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
-    //     tarFiles.push(taskChunkPath);
-    //     downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url, taskChunkPath));
-    //   }
-    //   await Promise.all(downloadPromises);
-    //   // Write tarFiles to _peth_cache.json
-    //   taskCacheData.tarFiles = tarFiles;
-    //   await utils.writeJsonFile(taskCacheFilePath, taskCacheData);
-    // }
+      // Download the task's code as a TAR file and set the new version locally
+      const downloadPromises = [];
+      const tarFiles = [];
+      for(let i = 0; i < taskChunksUrls.length; i++) {
+        const taskChunkUrl = taskChunksUrls[i];
+        const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
+        tarFiles.push(taskChunkPath);
+        downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url, taskChunkPath));
+      }
+      await Promise.all(downloadPromises);
+      // Write tarFiles to _peth_cache.json
+      taskCacheData.tarFiles = tarFiles;
+      await utils.writeJsonFile(taskCacheFilePath, taskCacheData);
+    }
   
-    // // Create a new folder for the task
-    // const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
-    // const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
+    // Create a new folder for the task
+    const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
+    const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
   
-    // // Extract the Task code Tar files to a new destination
-    // for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
-    //   const tarFile = taskCacheData.tarFiles[i];
-    //   await utils.extractTarFile(tarFile, taskTmpWorkDir);
-    // }
+    // Extract the Task code Tar files to a new destination
+    for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
+      const tarFile = taskCacheData.tarFiles[i];
+      await utils.extractTarFile(tarFile, taskTmpWorkDir);
+    }
   
     //TODO Merge the config from the run method with the task config folder
   
@@ -138,34 +126,15 @@ const runTask = async (taskMetaData) => {
       counter: 0,
       data: "Hello World",
       wish: "Jannah",
-      // taskMetaData,
-      // testAPI: (await utils.$dataCaller(
-      //   "get",
-      //   "/api/plugin_api/"+taskMetaData.apiData.pluginKey+"/testzz"
-      //   // "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
-      // )) || "Failed to call API",
     };
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
-    // setTimeout(() => {
-    const cacheTestResult = await utils.setCache(
-      "PETH-TEST-CACHE-KEY",
-      {
-        ...finalResult,
-        time: new Date().getTime(),
-        SML: 10
-      },
-      { group: "tasks-results-by-date-" + (new Date()).toISOString().slice(0, 10), }
-    );
-    // })
-    testLog("cacheTestResult done");
     // Updating the task result WITHOUT WAITING
     utils.setCache(
       key,
       finalResult,
       { group: "tasks-results-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
-    testLog("key done");
     const stateKey = "plugins-engine-task-state-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
     // Updating the task state WITHOUT WAITING
     utils.setCache(
@@ -173,7 +142,6 @@ const runTask = async (taskMetaData) => {
       "finished",
       { group: "tasks-states-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
-    testLog("stateKey done");
   
     return {
       ...finalResult,

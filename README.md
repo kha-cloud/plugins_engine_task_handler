@@ -43,6 +43,20 @@ npm install
 npm install -g ./
 ```
 
+### 4- Work area
+
+- Create the work folders
+```bash
+mkdir -p /var/plugins_engine_tasks
+mkdir -p /var/plugins_engine_tasks/archive
+mkdir -p /var/plugins_engine_tasks/work_dir
+```
+
+- Create the History file
+```bash
+touch /var/plugins_engine_tasks/tasks_history.list
+```
+
 ## Usage
 
 ```js
