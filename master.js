@@ -4,23 +4,26 @@ const utils = require("./utils");
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
-const execute_PETH_Master_runTask = async (data) => {
+const execute_PETH_runTask = async (workPath) => {
   return new Promise((resolve, reject) => {
-    const _data = JSON.stringify(data);
+    // const _data = JSON.stringify(data);
     const command = `
       (async () => {
-        const PETH = require('kha_plugins_engine_task_handler/master');
-        try {
-          const result = await PETH.runTask(${_data.replace(/"/g, '\\"')});
-          console.log('#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#');
-          console.log(JSON.stringify(result));
-          console.log('#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#');
-        } catch (err) {
-          console.error('Error in child process:', err);
-          process.exit(1);
-        }
+        const PETH = require('kha_plugins_engine_task_handler');
+        const workPath = '${workPath}';
+        process.chdir(workPath);
+        require('${workPath}/run.js');
       })();
     `;
+    // try {
+    //   const result = await PETH.runTask(${_data.replace(/"/g, '\\"')});
+    //   console.log('#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#');
+    //   console.log(JSON.stringify(result));
+    //   console.log('#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#');
+    // } catch (err) {
+    //   console.error('Error in child process:', err);
+    //   process.exit(1);
+    // }
     
     exec(`node -e "${command}"`, (error, stdout, stderr) => {
       // resolve({
@@ -31,20 +34,23 @@ const execute_PETH_Master_runTask = async (data) => {
         reject(`exec error: ${stderr}`);
         return;
       }
-      var regex = /#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#([\s\S]*?)#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#/;
-      var match = stdout.match(regex);
+      resolve({
+        success: true
+      });
+      // var regex = /#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#([\s\S]*?)#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#/;
+      // var match = stdout.match(regex);
       
-      try {
-        if (match && match[1]) {
-          const result = JSON.parse(match[1]);
-          resolve(result);
-        } else {
-          resolve();
-        }
-      } catch (parseError) {
-        console.log(stdout); 
-        reject(`Error parsing JSON output: ${parseError.message}`);
-      }
+      // try {
+      //   if (match && match[1]) {
+      //     const result = JSON.parse(match[1]);
+      //     resolve(result);
+      //   } else {
+      //     resolve();
+      //   }
+      // } catch (parseError) {
+      //   console.log(stdout); 
+      //   reject(`Error parsing JSON output: ${parseError.message}`);
+      // }
     });
   });
 }
@@ -183,7 +189,12 @@ const runTask = async (taskMetaData) => {
       // });
     // ------------------ 
   
-    //TODO Run the task (Wait for timeout then kill the process if it's still working)
+    // Run the task (Wait for timeout then kill the process if it's still working)
+    const result = await utils.execute_PETH_runTask(taskTmpWorkDir);
+    logs.push({
+      message: "result",
+      data: result,
+    });
     //TODO Use `tree-kill` to kill the process and it's children (npm install tree-kill)
 
     // Delete taskTmpWorkDir and all files in it
