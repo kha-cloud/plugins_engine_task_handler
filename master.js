@@ -41,7 +41,7 @@ const execute_PETH_runTask = async (workPath, pidCallback) => {
     // const subprocess = spawn('node', ['-e', command], {
     const child = spawn('sh', ['-c', shellCommand], {
       cwd: workPath, // Sets the child's current working directory
-      shell: true    // Use shell to execute the command
+      // shell: true    // Use shell to execute the command
       // detached: true,
       // stdio: 'ignore' // Ignore stdio to allow parent to exit independently
     });
