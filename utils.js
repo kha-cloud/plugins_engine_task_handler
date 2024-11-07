@@ -12,6 +12,19 @@ const utilsScope = () => {
     initialized = true;
   }
 
+  const replaceInCode = (code, pluginKey) => {
+    var newCode = code.replace(/@PS\//g, `/api/plugins_static/${pluginKey}/`);
+    // Plugins Key
+    newCode = newCode.replace(/@PK/g, `${pluginKey}`);
+    // Plugins API links
+    newCode = newCode.replace(/@PA\//g, `/api/plugin_api/${pluginKey}/`);
+    // Plugins VueJS links
+    newCode = newCode.replace(/@PV\//g, `/p/${pluginKey}/`);
+    // Plugins VueJS public links
+    newCode = newCode.replace(/@PVP\//g, `/public/${pluginKey}/`);
+    return newCode;
+  };
+
   const loadJsonFile = (filePath, defaultData) => {
     try {
       const _data = JSON.parse(fs.readFileSync(filePath, "utf8") || "{}");
@@ -42,7 +55,7 @@ const utilsScope = () => {
       const baseUrl = "https://" + taskMetaData.apiData.host;
       const response = await axios({
         method,
-        url: baseUrl + route,
+        url: baseUrl + replaceInCode(route, taskMetaData.apiData.pluginKey),
         data,
         headers
       });
