@@ -76,6 +76,9 @@ const runTask = async (taskMetaData) => {
   
     // Check the cache if the task's code got an update
     const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
+    if(!fs.existsSync(taskArchiveFolder)) {
+      fs.mkdirSync(taskArchiveFolder);
+    }
     const taskCacheFilePath = `${taskArchiveFolder}/_cache.json`;
     var taskCacheData = await utils.loadJsonFile(taskCacheFilePath, {
       taskCodeUpdateCacheKey: null,
@@ -84,6 +87,7 @@ const runTask = async (taskMetaData) => {
     logs.push({
       message: "taskCacheData",
       data: taskCacheData,
+      taskCodeUpdateCacheKey: taskMetaData.taskCodeUpdateCacheKey
     });
   
     if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
@@ -98,19 +102,24 @@ const runTask = async (taskMetaData) => {
         data: taskChunksUrls,
       });
       
-      // // Download the task's code as a TAR file and set the new version locally
-      // const downloadPromises = [];
-      // const tarFiles = [];
-      // for(let i = 0; i < taskChunksUrls.length; i++) {
-      //   const taskChunkUrl = taskChunksUrls[i];
-      //   const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
-      //   tarFiles.push(taskChunkPath);
-      //   downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url, taskChunkPath));
-      // }
-      // await Promise.all(downloadPromises);
-      // // Write tarFiles to _peth_cache.json
-      // taskCacheData.tarFiles = tarFiles;
-      // await utils.writeJsonFile(taskCacheFilePath, taskCacheData);
+      // Download the task's code as a TAR file and set the new version locally
+      const downloadPromises = [];
+      const tarFiles = [];
+      const randomDownloadKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
+      for(let i = 0; i < taskChunksUrls.length; i++) {
+        const taskChunkUrl = taskChunksUrls[i];
+        const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
+        tarFiles.push(taskChunkPath);
+        downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url+"?random="+randomDownloadKey, taskChunkPath));
+      }
+      await Promise.all(downloadPromises);
+      // Write tarFiles to _peth_cache.json
+      taskCacheData.tarFiles = tarFiles;
+      utils.writeJsonFile(taskCacheFilePath, taskCacheData);
+      logs.push({
+        message: "taskArchiveFolder",
+        data: fs.readdirSync(taskArchiveFolder),
+      });
     }
   
     // // Create a new folder for the task
