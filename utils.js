@@ -1,6 +1,7 @@
 const fs = require("fs");
 const axios = require("axios");
 const fetch = require("node-fetch");
+const tar = require('tar');
 
 const utilsScope = () => {
   var initialized = false;
@@ -77,7 +78,15 @@ const utilsScope = () => {
     }
   }
   
-  const extractTarFile = async (tarFilePath, filePath) => {
+  const extractTarFile = async (tarFilePath, extractFolderPath) => {
+    try {
+      return tar.extract({
+        file: tarFilePath,
+        cwd: extractFolderPath
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return {

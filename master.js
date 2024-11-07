@@ -123,15 +123,19 @@ const runTask = async (taskMetaData) => {
       });
     }
   
-    // // Create a new folder for the task
-    // const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
-    // const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
+    // Create a new folder for the task
+    const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
+    const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
   
-    // // Extract the Task code Tar files to a new destination
-    // for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
-    //   const tarFile = taskCacheData.tarFiles[i];
-    //   await utils.extractTarFile(tarFile, taskTmpWorkDir);
-    // }
+    // Extract the Task code Tar files to a new destination
+    for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
+      const tarFile = taskCacheData.tarFiles[i];
+      await utils.extractTarFile(tarFile, taskTmpWorkDir);
+    }
+    logs.push({
+      message: "taskTmpWorkDir",
+      data: fs.readdirSync(taskTmpWorkDir),
+    });
   
     //TODO Merge the config from the run method with the task config folder
   
@@ -141,6 +145,10 @@ const runTask = async (taskMetaData) => {
   
     //TODO Run the task (Wait for timeout then kill the process if it's still working)
     //TODO Use `tree-kill` to kill the process and it's children (npm install tree-kill)
+
+    //TODO Delete taskTmpWorkDir
+
+    //TODO Check tasksWorkDir and delete any folders created more than 7 days ago
   
     // // TODO If runAndWait is used then wait for the task to finish, then get the result from `_khap_task_result.json`
   
