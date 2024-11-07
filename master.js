@@ -71,6 +71,8 @@ const runTask = async (taskMetaData) => {
     }*/
   
     await utils.init(taskMetaData);
+
+    const logs = [];
   
     // Check the cache if the task's code got an update
     const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
@@ -78,28 +80,36 @@ const runTask = async (taskMetaData) => {
       taskCodeUpdateCacheKey: null,
       tarFiles: [],
     });
+    logs.push({
+      message: "taskCacheData",
+      data: taskCacheData,
+    });
   
-    // if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
-    //   // Get the Task's taskChunksUrls
-    //   const taskChunksUrls = await utils.$dataCaller(
-    //     "get",
-    //     "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
-    //   );
+    if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
+      // Get the Task's taskChunksUrls
+      const taskChunksUrls = await utils.$dataCaller(
+        "get",
+        "/api/peth/get_plugin_tasks_by_key/" + taskMetaData.apiData.pluginKey
+      );
+      logs.push({
+        message: "taskChunksUrls",
+        data: taskChunksUrls,
+      });
       
-    //   // Download the task's code as a TAR file and set the new version locally
-    //   const downloadPromises = [];
-    //   const tarFiles = [];
-    //   for(let i = 0; i < taskChunksUrls.length; i++) {
-    //     const taskChunkUrl = taskChunksUrls[i];
-    //     const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
-    //     tarFiles.push(taskChunkPath);
-    //     downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url, taskChunkPath));
-    //   }
-    //   await Promise.all(downloadPromises);
-    //   // Write tarFiles to _peth_cache.json
-    //   taskCacheData.tarFiles = tarFiles;
-    //   await utils.writeJsonFile(taskCacheFilePath, taskCacheData);
-    // }
+      // // Download the task's code as a TAR file and set the new version locally
+      // const downloadPromises = [];
+      // const tarFiles = [];
+      // for(let i = 0; i < taskChunksUrls.length; i++) {
+      //   const taskChunkUrl = taskChunksUrls[i];
+      //   const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
+      //   tarFiles.push(taskChunkPath);
+      //   downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url, taskChunkPath));
+      // }
+      // await Promise.all(downloadPromises);
+      // // Write tarFiles to _peth_cache.json
+      // taskCacheData.tarFiles = tarFiles;
+      // await utils.writeJsonFile(taskCacheFilePath, taskCacheData);
+    }
   
     // // Create a new folder for the task
     // const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
@@ -144,7 +154,7 @@ const runTask = async (taskMetaData) => {
   
     return {
       ...finalResult,
-      cacheTestResult
+      logs
     };
   
     return finalResult;
