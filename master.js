@@ -258,17 +258,26 @@ const runTask = async (taskMetaData) => {
       };
       var isTimeout = false;
       var finishedRunning = false;
+      const startTime = (new Date()).getTime();
       const timeoutCheckPromise = new Promise((resolve, reject) => {
         runPromise().then((result) => {
           finishedRunning = true;
           resolve();
-          logs.push("runPromise");
+          logs.push({
+            startTime,
+            took: ((new Date()).getTime() - startTime) / 1000,
+            msg: "runPromise"
+          });
         });
 
         sleep(10000).then(() => {
           finishedRunning = true;
           resolve();
-          logs.push("sleep(10000)");
+          logs.push({
+            startTime,
+            took: ((new Date()).getTime() - startTime) / 1000,
+            msg: "sleep(10000)"
+          });
         }),
 
         sleep(taskCacheData?.config?.timeout || 30000).then(() => {
@@ -277,7 +286,11 @@ const runTask = async (taskMetaData) => {
             isTimeout = true;
           }
           resolve();
-          logs.push("sleep(30000)");
+          logs.push({
+            startTime,
+            took: ((new Date()).getTime() - startTime) / 1000,
+            msg: "sleep(30000)"
+          });
         });
       });
       await timeoutCheckPromise;
