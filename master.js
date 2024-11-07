@@ -248,13 +248,15 @@ const runTask = async (taskMetaData) => {
     var pid = 0;
     try {
       const runPromise = async () => {
-        // const result = await execute_PETH_runTask(taskTmpWorkDir);
-        // // logs.push({
-        // //   message: "result",
-        // //   data: result,
-        // // });
-        // pid = result.pid;
-        return {};
+        return execute_PETH_runTask(taskTmpWorkDir).then((result) => {
+          pid = result.pid;
+          // logs.push({
+          //   message: "result",
+          //   data: result,
+          // });
+        }).catch((error) => {
+          throw error;
+        });
       };
       var isTimeout = false;
       var finishedRunning = false;
@@ -329,7 +331,7 @@ const runTask = async (taskMetaData) => {
       { group: "tasks-states-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
     
-    // If failed to kill child kill the whole family
+    // // If failed to kill child kill the whole family
     // if(killAll) {
     //   setTimeout(() => {
     //     kill(currentPid, 'SIGKILL');
