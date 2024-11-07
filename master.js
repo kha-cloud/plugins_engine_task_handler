@@ -262,13 +262,15 @@ const runTask = async (taskMetaData) => {
         runPromise().then((result) => {
           finishedRunning = true;
         }),
+
         sleep(10000),
-        // sleep(taskCacheData?.config?.timeout || 30000).then(() => {
-        // // sleep(5000).then(() => {
-        //   if (!finishedRunning) {
-        //     isTimeout = true;
-        //   }
-        // }),
+        
+        sleep(taskCacheData?.config?.timeout || 30000).then(() => {
+        // sleep(5000).then(() => {
+          if (!finishedRunning) {
+            isTimeout = true;
+          }
+        }),
       ];
       await Promise.race(promises);
       if (isTimeout) {
