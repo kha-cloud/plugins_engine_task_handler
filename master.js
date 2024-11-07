@@ -91,26 +91,32 @@ const runTask = async (taskMetaData) => {
     });
   
     if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
-      // Get the Task's taskChunksUrls
+      // Get the Task's taskChunks
       const allTasks = await utils.$dataCaller(
         "get",
         "/api/peth/get_plugin_tasks_by_key/" + taskMetaData.apiData.pluginKey
       );
-      const taskChunksUrls = allTasks.find((task) => task.key === taskMetaData.taskKey).chunks;
+      const currentTask = allTasks.find((task) => task.key === taskMetaData.taskKey);
+      // const taskConfig = currentTask.config;
+      const taskChunks = currentTask.chunks;
       logs.push({
-        message: "taskChunksUrls",
-        data: taskChunksUrls,
+        message: "currentTask",
+        data: currentTask,
       });
+      // logs.push({
+      //   message: "taskChunks",
+      //   data: taskChunks,
+      // });
       
       // Download the task's code as a TAR file and set the new version locally
       const downloadPromises = [];
       const tarFiles = [];
       const randomDownloadKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
-      for(let i = 0; i < taskChunksUrls.length; i++) {
-        const taskChunkUrl = taskChunksUrls[i];
-        const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
+      for(let i = 0; i < taskChunks.length; i++) {
+        const taskChunk = taskChunks[i];
+        const taskChunkPath = `${taskArchiveFolder}/${taskChunk.name}.tar`;
         tarFiles.push(taskChunkPath);
-        downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url+"?random="+randomDownloadKey, taskChunkPath));
+        downloadPromises.push(utils.downloadFileToPath(taskChunk.url+"?random="+randomDownloadKey, taskChunkPath));
       }
       await Promise.all(downloadPromises);
       // Write tarFiles to _peth_cache.json
@@ -139,6 +145,10 @@ const runTask = async (taskMetaData) => {
     });
   
     //TODO Merge the config from the run method with the task config folder
+    const khap_task_config = {
+      ...taskMetaData,
+
+    };
   
     //TODO Create the config file `_khap_task_config.json`
   
