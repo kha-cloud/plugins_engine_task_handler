@@ -1,5 +1,6 @@
 const fs = require("fs");
 const utils = require("./utils");
+const { exec, spawn } = require('child_process');
 
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
