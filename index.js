@@ -1,6 +1,12 @@
 const fs = require("fs");
+const utils = require("./utils");
 
-const taskConfig = JSON.parse(fs.readFileSync("./_khap_task_config.json", "utf8"));
+var taskConfig = null;
+
+const init = async () => {
+  taskConfig = JSON.parse(fs.readFileSync("./_khap_task_config.json", "utf8"));
+  await utils.init(taskConfig);
+};
 
 const getTaskData = () => {
   // Return the task data from the local file "_khap_task_data.json"
@@ -24,6 +30,8 @@ const setTaskResult = async (TaskResult) => {
 };
 
 module.exports = {
+  init,
   getTaskData,
   setTaskResult,
+  ...utils,
 };

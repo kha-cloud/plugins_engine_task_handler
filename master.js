@@ -19,6 +19,7 @@ const execute_PETH_runTask = async (workPath, pidCallback) => {
         // process.chdir(workPath);
 
         const PETH = require('kha_plugins_engine_task_handler');
+        await PETH.init();
         require('${workPath}/run.js');
       })();
     `;
