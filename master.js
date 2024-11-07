@@ -302,6 +302,10 @@ const runTask = async (taskMetaData) => {
         __ERROR__: "Error running task: " + taskMetaData.taskKey,
         __ERROR_DATA__: childError,
       };
+    } else if(isTimeout) {
+      finalResult = {
+        __TIMEOUT__: "Timeout running task: " + taskMetaData.taskKey + " after " + (taskCacheData?.config?.timeout || 30000) + "ms",
+      };
     } else {
       // Get the result from `_khap_task_result.json`
       finalResult = utils.loadJsonFile(`${taskTmpWorkDir}/_khap_task_result.json` || {});
