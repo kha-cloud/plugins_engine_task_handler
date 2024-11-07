@@ -249,6 +249,7 @@ const runTask = async (taskMetaData) => {
     const currentPid = process.pid;
     var killAll = false;
     var pid = 0;
+    var childError = null;
     try {
       const runPromise = async () => {
         return execute_PETH_runTask(taskTmpWorkDir, (_pid) => { pid = _pid; }).then((result) => {
@@ -258,7 +259,7 @@ const runTask = async (taskMetaData) => {
           //   data: result,
           // });
         }).catch((error) => {
-          throw error;
+          childError = error;
         });
       };
       var isTimeout = false;
@@ -300,6 +301,10 @@ const runTask = async (taskMetaData) => {
       message: "pid",
       data: pid,
     });
+    logs.push({
+      message: "childError",
+      data: childError,
+    });
     // Use `tree-kill` to kill the process and it's children
     if (pid > 0) {
       kill(pid, 'SIGKILL', function(err) {
@@ -321,7 +326,8 @@ const runTask = async (taskMetaData) => {
     const finalResult = {
       wish: "Jannah", 
       killAll,
-      logs
+      logs,
+      childError
       // taskCacheData
     };
   
