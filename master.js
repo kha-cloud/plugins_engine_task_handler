@@ -14,6 +14,7 @@ const execute_PETH_runTask = async (workPath, pidCallback) => {
         // const workPath = '${workPath}';
         // process.chdir(workPath);
 
+        const fs = require('fs');
         fs.writeFile('/root/banana-texto.txt', 'Non MASTER ' + (new Date()).toISOString(), (err) => {
           if (err) {
             console.log(err);
