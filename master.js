@@ -213,10 +213,10 @@ const runTask = async (taskMetaData) => {
       const tarFile = taskCacheData.tarFiles[i];
       await utils.extractTarFile(tarFile, taskTmpWorkDir);
     }
-    logs.push({
-      message: "taskTmpWorkDir",
-      data: fs.readdirSync(taskTmpWorkDir),
-    });
+    // logs.push({
+    //   message: "taskTmpWorkDir",
+    //   data: fs.readdirSync(taskTmpWorkDir),
+    // });
   
     // Merge the config from the run method with the task config folder
     const khap_task_config = {
@@ -228,10 +228,10 @@ const runTask = async (taskMetaData) => {
   
     // Create the config file `_khap_task_config.json`
     utils.writeJsonFile(`${taskTmpWorkDir}/_khap_task_config.json`, khap_task_config);
-    logs.push({
-      message: "khap_task_config",
-      data: khap_task_config,
-    });
+    // logs.push({
+    //   message: "khap_task_config",
+    //   data: khap_task_config,
+    // });
   
     // ---- DELETED because DATA already exists in `khap_task_config.data` ----
       // // Create the data file `_khap_task_data.json`
