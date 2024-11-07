@@ -190,7 +190,7 @@ const runTask = async (taskMetaData) => {
     // ------------------ 
   
     // Run the task (Wait for timeout then kill the process if it's still working)
-    const result = await utils.execute_PETH_runTask(taskTmpWorkDir);
+    const result = await execute_PETH_runTask(taskTmpWorkDir);
     logs.push({
       message: "result",
       data: result,
