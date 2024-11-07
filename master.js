@@ -114,6 +114,7 @@ const runTask = async (taskMetaData) => {
       }
       await Promise.all(downloadPromises);
       // Write tarFiles to _peth_cache.json
+      taskCacheData.taskCodeUpdateCacheKey = taskMetaData.taskCodeUpdateCacheKey;
       taskCacheData.tarFiles = tarFiles;
       utils.writeJsonFile(taskCacheFilePath, taskCacheData);
       logs.push({
