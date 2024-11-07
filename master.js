@@ -88,10 +88,11 @@ const runTask = async (taskMetaData) => {
   
     if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
       // Get the Task's taskChunksUrls
-      const taskChunksUrls = await utils.$dataCaller(
+      const allTasks = await utils.$dataCaller(
         "get",
         "/api/peth/get_plugin_tasks_by_key/" + taskMetaData.apiData.pluginKey
       );
+      const taskChunksUrls = allTasks.find((task) => task.key === taskMetaData.taskKey).chunks;
       logs.push({
         message: "taskChunksUrls",
         data: taskChunksUrls,
