@@ -315,6 +315,7 @@ const runTask = async (taskMetaData) => {
     const finalResult = {
       wish: "Jannah", 
       killAll,
+      logs
       // taskCacheData
     };
   
