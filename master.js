@@ -254,7 +254,7 @@ const runTask = async (taskMetaData) => {
         // //   data: result,
         // // });
         // pid = result.pid;
-        return;
+        return {};
       };
       var isTimeout = false;
       const promises = [
@@ -264,7 +264,7 @@ const runTask = async (taskMetaData) => {
           isTimeout = true;
         }),
       ];
-      await Promise.all(promises);
+      await Promise.race(promises);
       if (isTimeout) {
         killAll = true;
       }
