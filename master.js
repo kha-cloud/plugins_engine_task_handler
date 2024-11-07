@@ -8,10 +8,10 @@ const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
 const execute_PETH_runTask = async (workPath, pidCallback) => {
   return new Promise((resolve, reject) => {
-    reject({
-      error: `Process exited with code KKKKKKKKKKK`,
-    });
-    return;
+    // reject({
+    //   error: `Process exited with code KKKKKKKKKKK`,
+    // });
+    // return;
     // const _data = JSON.stringify(data);
     const command = `
       (async () => {
