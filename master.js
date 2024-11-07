@@ -6,7 +6,7 @@ const kill = require('tree-kill');
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
-const execute_PETH_runTask = async (workPath) => {
+const execute_PETH_runTask = async (workPath, pidCallback) => {
   return new Promise((resolve, reject) => {
     // const _data = JSON.stringify(data);
     const command = `
@@ -36,6 +36,7 @@ const execute_PETH_runTask = async (workPath) => {
       // stdio: 'ignore' // Ignore stdio to allow parent to exit independently
     });
     const pid = child.pid;
+    pidCallback(pid);
 
     let stdout = '';
     let stderr = '';
@@ -248,8 +249,8 @@ const runTask = async (taskMetaData) => {
     var pid = 0;
     try {
       const runPromise = async () => {
-        return execute_PETH_runTask(taskTmpWorkDir).then((result) => {
-          pid = result.pid;
+        return execute_PETH_runTask(taskTmpWorkDir, (_pid) => { pid = _pid; }).then((result) => {
+          // pid = result.pid;
           // logs.push({
           //   message: "result",
           //   data: result,
@@ -291,7 +292,7 @@ const runTask = async (taskMetaData) => {
       //   data: error,
       //   errorMessage: error.message,
       // });
-      pid = error.pid;
+      // pid = error.pid;
     }
     // Use `tree-kill` to kill the process and it's children
     if (pid > 0) {
