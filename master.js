@@ -309,6 +309,10 @@ const runTask = async (taskMetaData) => {
     } else {
       // Get the result from `_khap_task_result.json`
       finalResult = utils.loadJsonFile(`${taskTmpWorkDir}/_khap_task_result.json` || {});
+      logs.push({
+        message: "_khap_task_result.json",
+        data: fs.readFileSync(`${taskTmpWorkDir}/_khap_task_result.json`, "utf8"),
+      });
       // finalResult = {
       //   wish: "Jannah", 
       //   // killAll,
