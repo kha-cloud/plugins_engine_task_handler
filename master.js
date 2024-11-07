@@ -85,11 +85,11 @@ const runTask = async (taskMetaData) => {
       tarFiles: [],
       config: {}
     });
-    logs.push({
-      message: "taskCacheData",
-      data: taskCacheData,
-      taskCodeUpdateCacheKey: taskMetaData.taskCodeUpdateCacheKey
-    });
+    // logs.push({
+    //   message: "taskCacheData",
+    //   data: taskCacheData,
+    //   taskCodeUpdateCacheKey: taskMetaData.taskCodeUpdateCacheKey
+    // });
   
     if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
       // Get the Task's taskChunks
@@ -100,10 +100,10 @@ const runTask = async (taskMetaData) => {
       const currentTask = allTasks.find((task) => task.key === taskMetaData.taskKey);
       const taskConfig = currentTask.config;
       const taskChunks = currentTask.chunks;
-      logs.push({
-        message: "currentTask",
-        data: currentTask,
-      });
+      // logs.push({
+      //   message: "currentTask",
+      //   data: currentTask,
+      // });
       // logs.push({
       //   message: "taskChunks",
       //   data: taskChunks,
@@ -126,10 +126,10 @@ const runTask = async (taskMetaData) => {
       taskCacheData.tarFiles = tarFiles;
       taskCacheData.config = taskConfig;
       utils.writeJsonFile(taskCacheFilePath, taskCacheData);
-      logs.push({
-        message: "taskArchiveFolder",
-        data: fs.readdirSync(taskArchiveFolder),
-      });
+      // logs.push({
+      //   message: "taskArchiveFolder",
+      //   data: fs.readdirSync(taskArchiveFolder),
+      // });
     }
   
     // Create a new folder for the task
@@ -142,10 +142,10 @@ const runTask = async (taskMetaData) => {
       const tarFile = taskCacheData.tarFiles[i];
       await utils.extractTarFile(tarFile, taskTmpWorkDir);
     }
-    logs.push({
-      message: "taskTmpWorkDir",
-      data: fs.readdirSync(taskTmpWorkDir),
-    });
+    // logs.push({
+    //   message: "taskTmpWorkDir",
+    //   data: fs.readdirSync(taskTmpWorkDir),
+    // });
   
     // Merge the config from the run method with the task config folder
     const khap_task_config = {
@@ -157,10 +157,20 @@ const runTask = async (taskMetaData) => {
   
     // Create the config file `_khap_task_config.json`
     utils.writeJsonFile(`${taskTmpWorkDir}/_khap_task_config.json`, khap_task_config);
+    logs.push({
+      message: "khap_task_config",
+      data: khap_task_config,
+    });
   
     // Create the data file `_khap_task_data.json`
     utils.writeJsonFile(`${taskTmpWorkDir}/_khap_task_data.json`, {
       ...taskMetaData.data,
+    });
+    logs.push({
+      message: "khap_task_data",
+      data: {
+        ...taskMetaData.data,
+      },
     });
   
     //TODO Run the task (Wait for timeout then kill the process if it's still working)
@@ -174,7 +184,7 @@ const runTask = async (taskMetaData) => {
   
     const finalResult = {
       wish: "Jannah", 
-      taskCacheData
+      // taskCacheData
     };
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
