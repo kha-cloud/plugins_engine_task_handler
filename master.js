@@ -40,7 +40,8 @@ const execute_PETH_runTask = async (workPath) => {
         return;
       }
       resolve({
-        success: true
+        success: true,
+        stdout,
       });
       // var regex = /#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#([\s\S]*?)#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#/;
       // var match = stdout.match(regex);
