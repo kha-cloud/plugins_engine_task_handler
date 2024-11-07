@@ -261,10 +261,12 @@ const runTask = async (taskMetaData) => {
       const timeoutCheckPromise = new Promise((resolve, reject) => {
         runPromise().then((result) => {
           finishedRunning = true;
+          resolve();
         });
 
         sleep(10000).then(() => {
           finishedRunning = true;
+          resolve();
         }),
 
         sleep(taskCacheData?.config?.timeout || 30000).then(() => {
@@ -272,6 +274,7 @@ const runTask = async (taskMetaData) => {
           if (!finishedRunning) {
             isTimeout = true;
           }
+          resolve();
         });
       });
       await timeoutCheckPromise;
