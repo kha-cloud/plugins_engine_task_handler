@@ -251,8 +251,8 @@ const runTask = async (taskMetaData) => {
       const startTime = (new Date()).getTime();
       const timeoutCheckPromise = new Promise((resolve, reject) => {
         var waitedTime = 0;
-        // var timeToWait = taskCacheData?.config?.timeout || 30000;
-        var timeToWait = 5000;
+        var timeToWait = taskCacheData?.config?.timeout || 30000;
+        // var timeToWait = 5000;
         var interval = setInterval(() => {
           waitedTime += 100;
           if((waitedTime >= timeToWait) || finishedRunning) {
