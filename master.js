@@ -330,11 +330,11 @@ const runTask = async (taskMetaData) => {
     );
     
     // If failed to kill child kill the whole family
-    if(killAll) {
-      setTimeout(() => {
-        kill(currentPid, 'SIGKILL');
-      }, 5000);
-    }
+    // if(killAll) {
+    //   setTimeout(() => {
+    //     kill(currentPid, 'SIGKILL');
+    //   }, 5000);
+    // }
   
     return {
       ...finalResult,
