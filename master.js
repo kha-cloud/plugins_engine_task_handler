@@ -352,10 +352,12 @@ const runTask = async (taskMetaData) => {
       recursive: true, 
     }); 
   
-    return {
-      ...finalResult,
-      logs
-    };
+    return finalResult;
+  
+    // return {
+    //   ...finalResult,
+    //   logs
+    // };
   
     return finalResult;
   } catch (error) {
