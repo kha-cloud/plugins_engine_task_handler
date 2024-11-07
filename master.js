@@ -259,8 +259,8 @@ const runTask = async (taskMetaData) => {
       var isTimeout = false;
       const promises = [
         runPromise(),
-        // sleep(taskCacheData?.config?.timeout || 30000).then(() => {
-        sleep(5000).then(() => {
+        sleep(taskCacheData?.config?.timeout || 30000).then(() => {
+        // sleep(5000).then(() => {
           isTimeout = true;
         }),
       ];
