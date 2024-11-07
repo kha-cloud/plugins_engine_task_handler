@@ -76,6 +76,7 @@ const runTask = async (taskMetaData) => {
   
     // Check the cache if the task's code got an update
     const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
+    const taskCacheFilePath = `${taskArchiveFolder}/_cache.json`;
     var taskCacheData = await utils.loadJsonFile(taskCacheFilePath, {
       taskCodeUpdateCacheKey: null,
       tarFiles: [],
