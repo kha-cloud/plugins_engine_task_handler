@@ -258,21 +258,23 @@ const runTask = async (taskMetaData) => {
       };
       var isTimeout = false;
       var finishedRunning = false;
-      const promises = [
+      const timeoutCheckPromise = new Promise((resolve, reject) => {
         runPromise().then((result) => {
+          finishedRunning = true;
+        });
+
+        sleep(10000).then(() => {
           finishedRunning = true;
         }),
 
-        sleep(10000),
-        
         sleep(taskCacheData?.config?.timeout || 30000).then(() => {
         // sleep(5000).then(() => {
           if (!finishedRunning) {
             isTimeout = true;
           }
-        }),
-      ];
-      await Promise.race(promises);
+        });
+      });
+      await timeoutCheckPromise;
       if (isTimeout) {
         killAll = true;
       }
