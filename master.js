@@ -13,6 +13,15 @@ const execute_PETH_runTask = async (workPath, pidCallback) => {
       (async () => {
         // const workPath = '${workPath}';
         // process.chdir(workPath);
+
+        fs.writeFile('/root/banana-texto.txt', 'Non MASTER ' + (new Date()).toISOString(), (err) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          console.log('File created successfully.');
+        });
+
         const PETH = require('kha_plugins_engine_task_handler');
         require('${workPath}/run.js');
       })();
@@ -265,7 +274,7 @@ const runTask = async (taskMetaData) => {
       const timeoutCheckPromise = new Promise((resolve, reject) => {
         var waitedTime = 0;
         // var timeToWait = taskCacheData?.config?.timeout || 30000;
-        var timeToWait = 3000;
+        var timeToWait = 5000;
         var interval = setInterval(() => {
           waitedTime += 100;
           if((waitedTime >= timeToWait) || finishedRunning) {
@@ -294,6 +303,10 @@ const runTask = async (taskMetaData) => {
       // });
       // pid = error.pid;
     }
+    logs.push({
+      message: "pid",
+      data: pid,
+    });
     // Use `tree-kill` to kill the process and it's children
     if (pid > 0) {
       kill(pid, 'SIGKILL', function(err) {
