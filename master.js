@@ -259,8 +259,9 @@ const runTask = async (taskMetaData) => {
       var isTimeout = false;
       var finishedRunning = false;
       const startTime = (new Date()).getTime();
+      const promisesToEnd = [];
       const timeoutCheckPromise = new Promise((resolve, reject) => {
-        runPromise().then((result) => {
+        promisesToEnd.push(runPromise().then((result) => {
           finishedRunning = true;
           resolve();
           logs.push({
@@ -268,9 +269,9 @@ const runTask = async (taskMetaData) => {
             took: ((new Date()).getTime() - startTime) / 1000,
             msg: "runPromise"
           });
-        });
+        }));
 
-        sleep(10000).then(() => {
+        promisesToEnd.push(sleep(10000).then(() => {
           finishedRunning = true;
           resolve();
           logs.push({
@@ -278,9 +279,9 @@ const runTask = async (taskMetaData) => {
             took: ((new Date()).getTime() - startTime) / 1000,
             msg: "sleep(10000)"
           });
-        }),
+        }));
 
-        sleep(taskCacheData?.config?.timeout || 30000).then(() => {
+        promisesToEnd.push(sleep(taskCacheData?.config?.timeout || 30000).then(() => {
         // sleep(5000).then(() => {
           if (!finishedRunning) {
             isTimeout = true;
@@ -291,9 +292,14 @@ const runTask = async (taskMetaData) => {
             took: ((new Date()).getTime() - startTime) / 1000,
             msg: "sleep(30000)"
           });
-        });
+        }));
       });
       await timeoutCheckPromise;
+
+      // Mark all promisesToEnd as finished
+      for(let i = 0; i < promisesToEnd.length; i++) {
+        promisesToEnd[i].resolve();
+      }
       if (isTimeout) {
         killAll = true;
       }
