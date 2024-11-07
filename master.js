@@ -90,7 +90,6 @@ const runTask = async (taskMetaData) => {
     //   data: taskCacheData,
     //   taskCodeUpdateCacheKey: taskMetaData.taskCodeUpdateCacheKey
     // });
-  
     if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
       // Get the Task's taskChunks
       const allTasks = await utils.$dataCaller(
@@ -108,6 +107,15 @@ const runTask = async (taskMetaData) => {
       //   message: "taskChunks",
       //   data: taskChunks,
       // });
+
+      // Delete all in taskArchiveFolder without deleting the _cache.json
+      const archive_old_files = fs.readdirSync(taskArchiveFolder);
+      for(let i = 0; i < archive_old_files.length; i++) {
+        const file = archive_old_files[i];
+        if(file !== "_cache.json") {
+          fs.unlinkSync(`${taskArchiveFolder}/${file}`);
+        }
+      }
       
       // Download the task's code as a TAR file and set the new version locally
       const downloadPromises = [];
@@ -142,10 +150,10 @@ const runTask = async (taskMetaData) => {
       const tarFile = taskCacheData.tarFiles[i];
       await utils.extractTarFile(tarFile, taskTmpWorkDir);
     }
-    // logs.push({
-    //   message: "taskTmpWorkDir",
-    //   data: fs.readdirSync(taskTmpWorkDir),
-    // });
+    logs.push({
+      message: "taskTmpWorkDir",
+      data: fs.readdirSync(taskTmpWorkDir),
+    });
   
     // Merge the config from the run method with the task config folder
     const khap_task_config = {
@@ -162,21 +170,26 @@ const runTask = async (taskMetaData) => {
       data: khap_task_config,
     });
   
-    // Create the data file `_khap_task_data.json`
-    utils.writeJsonFile(`${taskTmpWorkDir}/_khap_task_data.json`, {
-      ...taskMetaData.data,
-    });
-    logs.push({
-      message: "khap_task_data",
-      data: {
-        ...taskMetaData.data,
-      },
-    });
+    // ---- DELETED because DATA already exists in `khap_task_config.data` ----
+      // // Create the data file `_khap_task_data.json`
+      // utils.writeJsonFile(`${taskTmpWorkDir}/_khap_task_data.json`, {
+      //   ...taskMetaData.data,
+      // });
+      // logs.push({
+      //   message: "khap_task_data",
+      //   data: {
+      //     ...taskMetaData.data,
+      //   },
+      // });
+    // ------------------ 
   
     //TODO Run the task (Wait for timeout then kill the process if it's still working)
     //TODO Use `tree-kill` to kill the process and it's children (npm install tree-kill)
 
-    //TODO Delete taskTmpWorkDir
+    // Delete taskTmpWorkDir and all files in it
+    fs.rmdirSync(taskTmpWorkDir, {
+      recursive: true, 
+    }); 
 
     //TODO Check tasksWorkDir and delete any folders created more than 7 days ago
   
