@@ -248,12 +248,12 @@ const runTask = async (taskMetaData) => {
     var pid = 0;
     try {
       const runPromise = async () => {
-        const result = await execute_PETH_runTask(taskTmpWorkDir);
-        // logs.push({
-        //   message: "result",
-        //   data: result,
-        // });
-        pid = result.pid;
+        // const result = await execute_PETH_runTask(taskTmpWorkDir);
+        // // logs.push({
+        // //   message: "result",
+        // //   data: result,
+        // // });
+        // pid = result.pid;
         return {};
       };
       var isTimeout = false;
