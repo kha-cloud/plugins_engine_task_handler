@@ -259,47 +259,26 @@ const runTask = async (taskMetaData) => {
       var isTimeout = false;
       var finishedRunning = false;
       const startTime = (new Date()).getTime();
-      const promisesToEnd = [];
       const timeoutCheckPromise = new Promise((resolve, reject) => {
-        promisesToEnd.push(runPromise().then((result) => {
-          finishedRunning = true;
-          resolve();
-          logs.push({
-            startTime,
-            took: ((new Date()).getTime() - startTime) / 1000,
-            msg: "runPromise"
-          });
-        }));
-
-        promisesToEnd.push(sleep(10000).then(() => {
-          finishedRunning = true;
-          resolve();
-          logs.push({
-            startTime,
-            took: ((new Date()).getTime() - startTime) / 1000,
-            msg: "sleep(10000)"
-          });
-        }));
-
-        promisesToEnd.push(sleep(taskCacheData?.config?.timeout || 30000).then(() => {
-        // sleep(5000).then(() => {
-          if (!finishedRunning) {
-            isTimeout = true;
+        var waitedTime = 0;
+        var timeToWait = taskCacheData?.config?.timeout || 30000;
+        var interval = setInterval(() => {
+          waitedTime += 100;
+          if((waitedTime >= timeToWait) || finishedRunning) {
+            clearInterval(interval);
+            logs.push("sleep(30000)" + ((new Date()).getTime() - startTime));
+            resolve();
           }
+        }, 100);
+
+        runPromise().then((result) => {
+          finishedRunning = true;
           resolve();
-          logs.push({
-            startTime,
-            took: ((new Date()).getTime() - startTime) / 1000,
-            msg: "sleep(30000)"
-          });
-        }));
+          clearInterval(interval);
+          logs.push("runPromise" + ((new Date()).getTime() - startTime));
+        });
       });
       await timeoutCheckPromise;
-
-      // Mark all promisesToEnd as finished
-      for(let i = 0; i < promisesToEnd.length; i++) {
-        promisesToEnd[i].resolve();
-      }
       if (isTimeout) {
         killAll = true;
       }
