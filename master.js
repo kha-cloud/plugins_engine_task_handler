@@ -191,11 +191,19 @@ const runTask = async (taskMetaData) => {
     // ------------------ 
   
     // Run the task (Wait for timeout then kill the process if it's still working)
-    const result = await execute_PETH_runTask(taskTmpWorkDir);
-    logs.push({
-      message: "result",
-      data: result,
-    });
+    try {
+      const result = await execute_PETH_runTask(taskTmpWorkDir);
+      logs.push({
+        message: "result",
+        data: result,
+      });
+    } catch (error) {
+      logs.push({
+        message: "error",
+        data: error,
+        errorMessage: error.message,
+      });
+    }
     //TODO Use `tree-kill` to kill the process and it's children (npm install tree-kill)
 
     // Delete taskTmpWorkDir and all files in it
