@@ -83,6 +83,7 @@ const runTask = async (taskMetaData) => {
     var taskCacheData = await utils.loadJsonFile(taskCacheFilePath, {
       taskCodeUpdateCacheKey: null,
       tarFiles: [],
+      config: {}
     });
     logs.push({
       message: "taskCacheData",
@@ -97,7 +98,7 @@ const runTask = async (taskMetaData) => {
         "/api/peth/get_plugin_tasks_by_key/" + taskMetaData.apiData.pluginKey
       );
       const currentTask = allTasks.find((task) => task.key === taskMetaData.taskKey);
-      // const taskConfig = currentTask.config;
+      const taskConfig = currentTask.config;
       const taskChunks = currentTask.chunks;
       logs.push({
         message: "currentTask",
@@ -119,9 +120,11 @@ const runTask = async (taskMetaData) => {
         downloadPromises.push(utils.downloadFileToPath(taskChunk.url+"?random="+randomDownloadKey, taskChunkPath));
       }
       await Promise.all(downloadPromises);
+
       // Write tarFiles to _peth_cache.json
       taskCacheData.taskCodeUpdateCacheKey = taskMetaData.taskCodeUpdateCacheKey;
       taskCacheData.tarFiles = tarFiles;
+      taskCacheData.config = taskConfig;
       utils.writeJsonFile(taskCacheFilePath, taskCacheData);
       logs.push({
         message: "taskArchiveFolder",
@@ -144,15 +147,21 @@ const runTask = async (taskMetaData) => {
       data: fs.readdirSync(taskTmpWorkDir),
     });
   
-    //TODO Merge the config from the run method with the task config folder
+    // Merge the config from the run method with the task config folder
     const khap_task_config = {
       ...taskMetaData,
-
+      config: {
+        ...taskCacheData.config
+      },
     };
   
-    //TODO Create the config file `_khap_task_config.json`
+    // Create the config file `_khap_task_config.json`
+    utils.writeJsonFile(`${taskTmpWorkDir}/_khap_task_config.json`, khap_task_config);
   
-    //TODO Create the data file `_khap_task_data.json`
+    // Create the data file `_khap_task_data.json`
+    utils.writeJsonFile(`${taskTmpWorkDir}/_khap_task_data.json`, {
+      ...taskMetaData.data,
+    });
   
     //TODO Run the task (Wait for timeout then kill the process if it's still working)
     //TODO Use `tree-kill` to kill the process and it's children (npm install tree-kill)
