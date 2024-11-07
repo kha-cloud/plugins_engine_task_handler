@@ -79,37 +79,37 @@ const runTask = async (taskMetaData) => {
       tarFiles: [],
     });
   
-    if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
-      // Get the Task's taskChunksUrls
-      const taskChunksUrls = await utils.$dataCaller(
-        "get",
-        "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
-      );
+    // if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
+    //   // Get the Task's taskChunksUrls
+    //   const taskChunksUrls = await utils.$dataCaller(
+    //     "get",
+    //     "/api/get_task_chunks_urls/" + taskMetaData.apiData.pluginKey + "/" + taskMetaData.taskKey
+    //   );
       
-      // Download the task's code as a TAR file and set the new version locally
-      const downloadPromises = [];
-      const tarFiles = [];
-      for(let i = 0; i < taskChunksUrls.length; i++) {
-        const taskChunkUrl = taskChunksUrls[i];
-        const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
-        tarFiles.push(taskChunkPath);
-        downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url, taskChunkPath));
-      }
-      await Promise.all(downloadPromises);
-      // Write tarFiles to _peth_cache.json
-      taskCacheData.tarFiles = tarFiles;
-      await utils.writeJsonFile(taskCacheFilePath, taskCacheData);
-    }
+    //   // Download the task's code as a TAR file and set the new version locally
+    //   const downloadPromises = [];
+    //   const tarFiles = [];
+    //   for(let i = 0; i < taskChunksUrls.length; i++) {
+    //     const taskChunkUrl = taskChunksUrls[i];
+    //     const taskChunkPath = `${taskArchiveFolder}/${taskChunkUrl.name}.tar`;
+    //     tarFiles.push(taskChunkPath);
+    //     downloadPromises.push(utils.downloadFileToPath(taskChunkUrl.url, taskChunkPath));
+    //   }
+    //   await Promise.all(downloadPromises);
+    //   // Write tarFiles to _peth_cache.json
+    //   taskCacheData.tarFiles = tarFiles;
+    //   await utils.writeJsonFile(taskCacheFilePath, taskCacheData);
+    // }
   
-    // Create a new folder for the task
-    const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
-    const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
+    // // Create a new folder for the task
+    // const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
+    // const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
   
-    // Extract the Task code Tar files to a new destination
-    for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
-      const tarFile = taskCacheData.tarFiles[i];
-      await utils.extractTarFile(tarFile, taskTmpWorkDir);
-    }
+    // // Extract the Task code Tar files to a new destination
+    // for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
+    //   const tarFile = taskCacheData.tarFiles[i];
+    //   await utils.extractTarFile(tarFile, taskTmpWorkDir);
+    // }
   
     //TODO Merge the config from the run method with the task config folder
   
@@ -123,9 +123,8 @@ const runTask = async (taskMetaData) => {
     // // TODO If runAndWait is used then wait for the task to finish, then get the result from `_khap_task_result.json`
   
     const finalResult = {
-      counter: 0,
-      data: "Hello World",
-      wish: "Jannah",
+      wish: "Jannah", 
+      taskCacheData
     };
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
