@@ -258,6 +258,7 @@ const runTask = async (taskMetaData) => {
           if((waitedTime >= timeToWait) || finishedRunning) {
             clearInterval(interval);
             logs.push("sleep(30000)" + ((new Date()).getTime() - startTime));
+            isTimeout = true;
             resolve();
           }
         }, 100);
