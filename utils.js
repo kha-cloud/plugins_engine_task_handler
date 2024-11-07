@@ -29,7 +29,7 @@ const utilsScope = () => {
     try {
       const _data = JSON.parse(fs.readFileSync(filePath, "utf8") || "{}");
       return {
-        ...defaultData,
+        ...(defaultData || {}),
         ..._data
       };
     } catch (error) {
