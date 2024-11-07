@@ -33,5 +33,5 @@ module.exports = {
   init,
   getTaskData,
   setTaskResult,
-  ...utils,
+  utils,
 };
