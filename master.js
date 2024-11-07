@@ -32,7 +32,11 @@ const execute_PETH_runTask = async (workPath) => {
       //   stderr
       // });
       if (error || (stderr && !stdout)) {
-        reject(`exec error: ${stderr}`);
+        reject({
+          error: `exec error`,
+          stdout,
+          stderr
+        });
         return;
       }
       resolve({

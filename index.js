@@ -1,5 +1,9 @@
 const fs = require("fs");
 
+console.log("process.cwd() +++++++");
+console.log(process.cwd());
+
+
 const taskConfig = JSON.parse(fs.readFileSync("./_khap_task_config.json", "utf8"));
 
 const getTaskData = () => {
