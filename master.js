@@ -291,11 +291,6 @@ const runTask = async (taskMetaData) => {
       killAll = true;
     }
 
-    // Delete taskTmpWorkDir and all files in it
-    fs.rmdirSync(taskTmpWorkDir, {
-      recursive: true, 
-    }); 
-
     //TODO Check tasksWorkDir and delete any folders created more than 7 days ago
   
     // // TODO If runAndWait is used then wait for the task to finish, then get the result from `_khap_task_result.json`
@@ -309,10 +304,14 @@ const runTask = async (taskMetaData) => {
     } else {
       // Get the result from `_khap_task_result.json`
       finalResult = utils.loadJsonFile(`${taskTmpWorkDir}/_khap_task_result.json` || {});
-      logs.push({
-        message: "_khap_task_result.json",
-        data: fs.readFileSync(`${taskTmpWorkDir}/_khap_task_result.json`, "utf8"),
-      });
+      // logs.push({
+      //   message: "_khap_task_result.json",
+      //   data: fs.readFileSync(`${taskTmpWorkDir}/_khap_task_result.json`, "utf8"),
+      // });
+      // logs.push({
+      //   message: "_khap_task_result.json",
+      //   data: fs.readFileSync(`${taskTmpWorkDir}/_khap_task_result.json`, "utf8"),
+      // });
       // finalResult = {
       //   wish: "Jannah", 
       //   // killAll,
@@ -342,6 +341,11 @@ const runTask = async (taskMetaData) => {
     //     kill(currentPid, 'SIGKILL');
     //   }, 5000);
     // }
+
+    // Delete taskTmpWorkDir and all files in it
+    fs.rmdirSync(taskTmpWorkDir, {
+      recursive: true, 
+    }); 
   
     return {
       ...finalResult,
