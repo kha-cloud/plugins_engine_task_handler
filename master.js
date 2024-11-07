@@ -126,6 +126,7 @@ const runTask = async (taskMetaData) => {
     // Create a new folder for the task
     const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
     const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
+    fs.mkdirSync(taskTmpWorkDir);
   
     // Extract the Task code Tar files to a new destination
     for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
