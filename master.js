@@ -8,30 +8,13 @@ const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
 const execute_PETH_runTask = async (workPath, pidCallback) => {
   return new Promise((resolve, reject) => {
-    // reject({
-    //   error: `Process exited with code KKKKKKKKKKK`,
-    // });
-    // return;
-    // const _data = JSON.stringify(data);
     const command = `
       (async () => {
-        // const workPath = '${workPath}';
-        // process.chdir(workPath);
-
         const PETH = require('kha_plugins_engine_task_handler');
         await PETH.init();
         require('${workPath}/run.js');
       })();
     `;
-    // try {
-    //   const result = await PETH.runTask(${_data.replace(/"/g, '\\"')});
-    //   console.log('#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#');
-    //   console.log(JSON.stringify(result));
-    //   console.log('#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#');
-    // } catch (err) {
-    //   console.error('Error in child process:', err);
-    //   process.exit(1);
-    // }
     
     const shellCommand = `node -e "${command}"`;
     // const subprocess = spawn('node', ['-e', command], {
@@ -298,14 +281,7 @@ const runTask = async (taskMetaData) => {
       // });
       // pid = error.pid;
     }
-    // logs.push({
-    //   message: "pid",
-    //   data: pid,
-    // });
-    // logs.push({
-    //   message: "childError",
-    //   data: childError,
-    // });
+    
     // Use `tree-kill` to kill the process and it's children
     if (pid > 0) {
       kill(pid, 'SIGKILL', function(err) {
@@ -327,17 +303,18 @@ const runTask = async (taskMetaData) => {
     var finalResult = {};
     if(childError) {
       finalResult = {
-        success: false,
-        error: "Error running task: " + taskMetaData.taskKey,
-        errorData: childError,
+        __ERROR__: "Error running task: " + taskMetaData.taskKey,
+        __ERROR_DATA__: childError,
       };
     } else {
-      finalResult = {
-        wish: "Jannah", 
-        // killAll,
-        logs,
-        // taskCacheData
-      };
+      // Get the result from `_khap_task_result.json`
+      finalResult = utils.loadJsonFile(`${taskTmpWorkDir}/_khap_task_result.json` || {});
+      // finalResult = {
+      //   wish: "Jannah", 
+      //   // killAll,
+      //   logs,
+      //   // taskCacheData
+      // };
     }
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
