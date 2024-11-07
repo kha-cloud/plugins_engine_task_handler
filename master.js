@@ -297,14 +297,14 @@ const runTask = async (taskMetaData) => {
       // });
       // pid = error.pid;
     }
-    logs.push({
-      message: "pid",
-      data: pid,
-    });
-    logs.push({
-      message: "childError",
-      data: childError,
-    });
+    // logs.push({
+    //   message: "pid",
+    //   data: pid,
+    // });
+    // logs.push({
+    //   message: "childError",
+    //   data: childError,
+    // });
     // Use `tree-kill` to kill the process and it's children
     if (pid > 0) {
       kill(pid, 'SIGKILL', function(err) {
@@ -323,13 +323,21 @@ const runTask = async (taskMetaData) => {
   
     // // TODO If runAndWait is used then wait for the task to finish, then get the result from `_khap_task_result.json`
   
-    const finalResult = {
-      wish: "Jannah", 
-      killAll,
-      logs,
-      childError
-      // taskCacheData
-    };
+    var finalResult = {};
+    if(childError) {
+      finalResult = {
+        success: false,
+        error: "Error running task: " + taskMetaData.taskKey,
+        errorData: childError,
+      };
+    } else {
+      finalResult = {
+        wish: "Jannah", 
+        // killAll,
+        logs,
+        // taskCacheData
+      };
+    }
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;
     // Updating the task result WITHOUT WAITING
