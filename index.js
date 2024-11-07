@@ -1,18 +1,15 @@
 const fs = require("fs");
 
-console.log("process.cwd() +++++++");
-console.log(process.cwd());
-
-
 const taskConfig = JSON.parse(fs.readFileSync("./_khap_task_config.json", "utf8"));
 
 const getTaskData = () => {
   // Return the task data from the local file "_khap_task_data.json"
-  try {
-    return JSON.parse(fs.readFileSync("./_khap_task_data.json", "utf8"));
-  } catch (error) {
-    return {};
-  }
+  return taskConfig?.data || {};
+  // try {
+  //   return JSON.parse(fs.readFileSync("./_khap_task_data.json", "utf8"));
+  // } catch (error) {
+  //   return {};
+  // }
 };
 
 const setTaskResult = async (TaskResult) => {

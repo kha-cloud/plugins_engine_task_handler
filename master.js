@@ -1,6 +1,7 @@
 const fs = require("fs");
 const utils = require("./utils");
 const { exec, spawn } = require('child_process');
+const kill = require('tree-kill');
 
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
@@ -10,8 +11,8 @@ const execute_PETH_runTask = async (workPath) => {
     // const _data = JSON.stringify(data);
     const command = `
       (async () => {
-        const workPath = '${workPath}';
-        process.chdir(workPath);
+        // const workPath = '${workPath}';
+        // process.chdir(workPath);
         const PETH = require('kha_plugins_engine_task_handler');
         require('${workPath}/run.js');
       })();
@@ -26,38 +27,82 @@ const execute_PETH_runTask = async (workPath) => {
     //   process.exit(1);
     // }
     
-    exec(`node -e "${command}"`, (error, stdout, stderr) => {
-      // resolve({
-      //   stdout,
-      //   stderr
-      // });
-      if (error || (stderr && !stdout)) {
+    const shellCommand = `node -e "${command}"`;
+    // const subprocess = spawn('node', ['-e', command], {
+    const child = spawn('sh', ['-c', shellCommand], {
+      cwd: workPath, // Sets the child's current working directory
+      shell: true    // Use shell to execute the command
+      // detached: true,
+      // stdio: 'ignore' // Ignore stdio to allow parent to exit independently
+    });
+    const pid = child.pid;
+
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (data) => {
+      stdout += data;
+    });
+    child.stderr.on('data', (data) => {
+      stderr += data;
+    });
+
+    child.on('close', (code) => {
+      if (code !== 0 || (stderr && !stdout)) {
         reject({
-          error: `exec error`,
-          stdout,
+          pid,
+          error: `Process exited with code ${code}`,
           stderr
         });
-        return;
+      } else {
+        resolve({
+          pid,
+          success: true,
+          stdout,
+          pid: child.pid  // Provide the process ID
+        });
       }
-      resolve({
-        success: true,
-        stdout,
-      });
-      // var regex = /#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#([\s\S]*?)#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#/;
-      // var match = stdout.match(regex);
-      
-      // try {
-      //   if (match && match[1]) {
-      //     const result = JSON.parse(match[1]);
-      //     resolve(result);
-      //   } else {
-      //     resolve();
-      //   }
-      // } catch (parseError) {
-      //   console.log(stdout); 
-      //   reject(`Error parsing JSON output: ${parseError.message}`);
-      // }
     });
+
+    // Handle errors with the child process
+    child.on('error', (err) => {
+      reject({
+        error: 'Failed to start child process',
+        detail: err.message
+      });
+    });
+
+    // exec(`node -e "${command}"`, (error, stdout, stderr) => {
+    //   // resolve({
+    //   //   stdout,
+    //   //   stderr
+    //   // });
+    //   if (error || (stderr && !stdout)) {
+    //     reject({
+    //       error: `exec error`,
+    //       // stdout,
+    //       stderr
+    //     });
+    //     return;
+    //   }
+    //   resolve({
+    //     success: true,
+    //     // stdout,
+    //   });
+    //   // var regex = /#%PETH__TASK_SINGLE_RUN_RESULT_START__PETH%#([\s\S]*?)#%PETH__TASK_SINGLE_RUN_RESULT_END__PETH%#/;
+    //   // var match = stdout.match(regex);
+      
+    //   // try {
+    //   //   if (match && match[1]) {
+    //   //     const result = JSON.parse(match[1]);
+    //   //     resolve(result);
+    //   //   } else {
+    //   //     resolve();
+    //   //   }
+    //   // } catch (parseError) {
+    //   //   console.log(stdout); 
+    //   //   reject(`Error parsing JSON output: ${parseError.message}`);
+    //   // }
+    // });
   });
 }
 
@@ -196,20 +241,32 @@ const runTask = async (taskMetaData) => {
     // ------------------ 
   
     // Run the task (Wait for timeout then kill the process if it's still working)
+    const currentPid = process.pid;
+    var killAll = false;
+    var pid = 0;
     try {
       const result = await execute_PETH_runTask(taskTmpWorkDir);
-      logs.push({
-        message: "result",
-        data: result,
-      });
+      // logs.push({
+      //   message: "result",
+      //   data: result,
+      // });
+      pid = result.pid;
     } catch (error) {
-      logs.push({
-        message: "error",
-        data: error,
-        errorMessage: error.message,
-      });
+      // logs.push({
+      //   message: "error",
+      //   data: error,
+      //   errorMessage: error.message,
+      // });
+      pid = error.pid;
     }
-    //TODO Use `tree-kill` to kill the process and it's children (npm install tree-kill)
+    // Use `tree-kill` to kill the process and it's children
+    if (pid) {
+      kill(pid, 'SIGKILL', function(err) {
+        // Do things
+      });
+    } else {
+      killAll = true;
+    }
 
     // Delete taskTmpWorkDir and all files in it
     fs.rmdirSync(taskTmpWorkDir, {
@@ -239,6 +296,13 @@ const runTask = async (taskMetaData) => {
       "finished",
       { group: "tasks-states-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
+    
+    // If failed to kill child kill the whole family
+    if(killAll) {
+      setTimeout(() => {
+        kill(currentPid, 'SIGKILL');
+      }, 5000);
+    }
   
     return {
       ...finalResult,
