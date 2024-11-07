@@ -10,9 +10,9 @@ const execute_PETH_runTask = async (workPath) => {
     // const _data = JSON.stringify(data);
     const command = `
       (async () => {
-        const PETH = require('kha_plugins_engine_task_handler');
         const workPath = '${workPath}';
         process.chdir(workPath);
+        const PETH = require('kha_plugins_engine_task_handler');
         require('${workPath}/run.js');
       })();
     `;
