@@ -8,20 +8,15 @@ const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
 const execute_PETH_runTask = async (workPath, pidCallback) => {
   return new Promise((resolve, reject) => {
+    reject({
+      error: `Process exited with code KKKKKKKKKKK`,
+    });
+    return;
     // const _data = JSON.stringify(data);
     const command = `
       (async () => {
         // const workPath = '${workPath}';
         // process.chdir(workPath);
-
-        const fs = require('fs');
-        fs.writeFile('/root/banana-texto.txt', 'Non MASTER ' + (new Date()).toISOString(), (err) => {
-          if (err) {
-            console.log(err);
-            return;
-          }
-          console.log('File created successfully.');
-        });
 
         const PETH = require('kha_plugins_engine_task_handler');
         require('${workPath}/run.js');
@@ -40,10 +35,7 @@ const execute_PETH_runTask = async (workPath, pidCallback) => {
     const shellCommand = `node -e "${command}"`;
     // const subprocess = spawn('node', ['-e', command], {
     const child = spawn('sh', ['-c', shellCommand], {
-      cwd: workPath, // Sets the child's current working directory
-      // shell: true    // Use shell to execute the command
-      // detached: true,
-      // stdio: 'ignore' // Ignore stdio to allow parent to exit independently
+      cwd: workPath,
     });
     const pid = child.pid;
     pidCallback(pid);
