@@ -98,6 +98,9 @@ const execute_PETH_runTask = async (workPath, pidCallback, isProduction = true) 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => {
+  return {
+    test: "test"
+  };
   try {
     /* taskMetaData : {
       runAndWait, // Boolean
