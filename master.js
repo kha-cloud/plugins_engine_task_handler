@@ -323,8 +323,6 @@ const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => 
 
     //TODO Check tasksWorkDir and delete any folders created more than 7 days ago
   
-    // // TODO If runAndWait is used then wait for the task to finish, then get the result from `_khap_task_result.json`
-  
     var finalResult = {};
     if(childError) {
       finalResult = {
