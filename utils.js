@@ -41,7 +41,7 @@ const utilsScope = () => {
     fs.writeFileSync(filePath, JSON.stringify(data));
   }
   
-  const $dataCaller = async (method, route, data = {}, _headers = {}) => {
+  const $dataCaller = async (method, route, data = {}, _config = {}, _headers = {}) => {
     // `data` is only used for POST,PUT request
     // `_headers` will be added to the request headers
     // The token should be used from the taskMetaData.apiData.token.
@@ -49,15 +49,21 @@ const utilsScope = () => {
     var headers = {
       "Content-Type": "application/json",
       "_token": taskMetaData.apiData.token,
-      ..._headers
+      ..._headers,
+      ...((_config || {}).headers || {})
     };
+    var config = {
+      ..._config,
+    };
+    delete config.headers;
     try {
       const baseUrl = "https://" + taskMetaData.apiData.host;
       const response = await axios({
         method,
         url: baseUrl + replaceInCode(route, taskMetaData.apiData.pluginKey),
         data,
-        headers
+        headers,
+        ...config
       });
       return response.data;
     } catch (error) {

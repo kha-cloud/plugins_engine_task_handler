@@ -6,12 +6,14 @@ const kill = require('tree-kill');
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
 
-const execute_PETH_runTask = async (workPath, pidCallback) => {
+const execute_PETH_runTask = async (workPath, pidCallback, isProduction = true) => {
   return new Promise((resolve, reject) => {
     const command = `
       (async () => {
         const PETH = require('kha_plugins_engine_task_handler');
-        await PETH.init();
+        await PETH.init({
+          isProduction: ${isProduction}
+        });
         require('${workPath}/run.js');
       })();
     `;
@@ -95,7 +97,7 @@ const execute_PETH_runTask = async (workPath, pidCallback) => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const runTask = async (taskMetaData) => {
+const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => {
   try {
     /* taskMetaData : {
       runAndWait, // Boolean
@@ -122,21 +124,32 @@ const runTask = async (taskMetaData) => {
   
     // Check the cache if the task's code got an update
     const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
-    if(!fs.existsSync(taskArchiveFolder)) {
+    if(isProduction && !fs.existsSync(taskArchiveFolder)) {
       fs.mkdirSync(taskArchiveFolder);
     }
     const taskCacheFilePath = `${taskArchiveFolder}/_cache.json`;
-    var taskCacheData = await utils.loadJsonFile(taskCacheFilePath, {
-      taskCodeUpdateCacheKey: null,
-      tarFiles: [],
-      config: {}
-    });
+    var taskCacheData = null;
+    if(isProduction) {
+      taskCacheData = await utils.loadJsonFile(taskCacheFilePath, {
+        production: isProduction,
+        taskCodeUpdateCacheKey: null,
+        tarFiles: [],
+        config: {}
+      });
+    } else {
+      taskCacheData = {
+        production: isProduction,
+        taskCodeUpdateCacheKey: null,
+        tarFiles: [],
+        config: taskMetaData.config,
+      };
+    }
     // logs.push({
     //   message: "taskCacheData",
     //   data: taskCacheData,
     //   taskCodeUpdateCacheKey: taskMetaData.taskCodeUpdateCacheKey
     // });
-    if(taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey) {
+    if(isProduction && (taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey)) {
       // Get the Task's taskChunks
       const allTasks = await utils.$dataCaller(
         "get",
@@ -188,13 +201,20 @@ const runTask = async (taskMetaData) => {
   
     // Create a new folder for the task
     const randomKey = Math.random().toString(36).substring(2, 15) + (new Date()).getTime().toString(36);
-    const taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
-    fs.mkdirSync(taskTmpWorkDir);
+    var taskTmpWorkDir = null;
+    if(isProduction) {
+      taskTmpWorkDir = `${tasksWorkDir}/${taskMetaData.taskKey}_${randomKey}`;
+      fs.mkdirSync(taskTmpWorkDir);
+    } else {
+      taskTmpWorkDir = testModeData.taskTmpWorkDir;
+    }
   
     // Extract the Task code Tar files to a new destination
-    for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
-      const tarFile = taskCacheData.tarFiles[i];
-      await utils.extractTarFile(tarFile, taskTmpWorkDir);
+    if(isProduction) {
+      for(let i = 0; i < taskCacheData.tarFiles.length; i++) {
+        const tarFile = taskCacheData.tarFiles[i];
+        await utils.extractTarFile(tarFile, taskTmpWorkDir);
+      }
     }
     // logs.push({
     //   message: "taskTmpWorkDir",
@@ -228,6 +248,12 @@ const runTask = async (taskMetaData) => {
       //   },
       // });
     // ------------------ 
+
+    // TEST MODE DATA DELETION
+    if(!isProduction && fs.existsSync(`${testModeData.taskDir}/kha-task-test-result.jsonc`)) {
+      // fs.writeFileSync(`${testModeData.taskDir}/kha-task-test-result.jsonc`, "", "utf8");
+      fs.unlinkSync(`${testModeData.taskDir}/kha-task-test-result.jsonc`);
+    }
   
     // Run the task (Wait for timeout then kill the process if it's still working)
     const currentPid = process.pid;
@@ -236,7 +262,7 @@ const runTask = async (taskMetaData) => {
     var childError = null;
     try {
       const runPromise = async () => {
-        return execute_PETH_runTask(taskTmpWorkDir, (_pid) => { pid = _pid; }).then((result) => {
+        return execute_PETH_runTask(taskTmpWorkDir, (_pid) => { pid = _pid; }, isProduction).then((result) => {
           // pid = result.pid;
           // logs.push({
           //   message: "result",
@@ -323,6 +349,13 @@ const runTask = async (taskMetaData) => {
       //   logs,
       //   // taskCacheData
       // };
+    }
+
+    // TEST MODE RETURN
+    if(!isProduction) {
+      fs.writeFileSync(`${testModeData.taskDir}/kha-task-test-result.jsonc`, JSON.stringify(finalResult, null, 2), "utf8");
+      // process.exit(0);
+      return finalResult;
     }
   
     const key = "plugins-engine-task-result-of-" + taskMetaData.taskKey + "-" + taskMetaData.runId;

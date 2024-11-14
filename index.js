@@ -2,10 +2,20 @@ const fs = require("fs");
 const utils = require("./utils");
 
 var taskConfig = null;
+var isProduction = true;
 
-const init = async () => {
+const init = async (_options) => {
+  const options = {
+    ...(_options || {}),
+  };
   taskConfig = JSON.parse(fs.readFileSync("./_khap_task_config.json", "utf8"));
+  isProduction = options.isProduction;
+
   await utils.init(taskConfig);
+};
+
+const isTestMode = () => {
+  return !isProduction;
 };
 
 const getTaskData = () => {
@@ -31,6 +41,7 @@ const setTaskResult = async (TaskResult) => {
 
 module.exports = {
   init,
+  isTestMode,
   getTaskData,
   setTaskResult,
   utils,
