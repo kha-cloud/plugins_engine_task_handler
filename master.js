@@ -105,6 +105,7 @@ const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => 
     /* taskMetaData : {
       runAndWait, // Boolean
       taskKey,
+      appId,
       runId,
       taskCodeUpdateCacheKey,
       taskVersion.
@@ -120,15 +121,17 @@ const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => 
       },
       taskConfig,
     }*/
+
+    const appPluginArchiveFolder = taskMetaData.apiData.appId + "/" + taskMetaData.apiData.pluginKey;
   
     await utils.init(taskMetaData);
 
     const logs = [];
   
     // Check the cache if the task's code got an update
-    const taskArchiveFolder = `${archiveFolder}/${taskMetaData.taskKey}`;
+    const taskArchiveFolder = `${archiveFolder}/${appPluginArchiveFolder}/${taskMetaData.taskKey}`;
     if(isProduction && !fs.existsSync(taskArchiveFolder)) {
-      fs.mkdirSync(taskArchiveFolder);
+      fs.mkdirSync(taskArchiveFolder, { recursive: true });
     }
     const taskCacheFilePath = `${taskArchiveFolder}/_cache.json`;
     var taskCacheData = null;

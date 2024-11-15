@@ -89,13 +89,26 @@ const utilsScope = () => {
   
   const downloadFileToPath = async (fileUrl, filePath) => {
     try {
-      const response = await fetch(fileUrl);
-      const buffer = await response.buffer();
-      fs.writeFileSync(filePath, buffer);
+      const response = await axios({
+        method: "get",
+        url: fileUrl,
+        responseType: "arraybuffer"
+      });
+      fs.writeFileSync(filePath, response.data);
     } catch (error) {
       console.error(error);
     }
   }
+  
+  // const downloadFileToPath = async (fileUrl, filePath) => {
+  //   try {
+  //     const response = await fetch(fileUrl);
+  //     const buffer = await response.buffer();
+  //     fs.writeFileSync(filePath, buffer);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
   
   const extractTarFile = async (tarFilePath, extractFolderPath) => {
     try {
