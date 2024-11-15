@@ -163,12 +163,12 @@ const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => 
     //   data: taskCacheData,
     //   taskCodeUpdateCacheKey: taskMetaData.taskCodeUpdateCacheKey
     // });
-    devLog(`TIME: ${new Date()}`);
-    devLog(`isProduction = ${isProduction}`);
-    devLog(`taskMetaData.taskCodeUpdateCacheKey = ${taskMetaData.taskCodeUpdateCacheKey}`);
-    devLog(`taskCacheData.taskCodeUpdateCacheKey = ${taskCacheData.taskCodeUpdateCacheKey}`);
-    devLog(`Check RES = ${(isProduction && (taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey)) ? "YES" : "NO"}`);
-    devLog(`\n\n`);
+    // devLog(`TIME: ${new Date()}`);
+    // devLog(`isProduction = ${isProduction}`);
+    // devLog(`taskMetaData.taskCodeUpdateCacheKey = ${taskMetaData.taskCodeUpdateCacheKey}`);
+    // devLog(`taskCacheData.taskCodeUpdateCacheKey = ${taskCacheData.taskCodeUpdateCacheKey}`);
+    // devLog(`Check RES = ${(isProduction && (taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey)) ? "YES" : "NO"}`);
+    // devLog(`\n\n`);
     if(isProduction && (taskMetaData.taskCodeUpdateCacheKey !== taskCacheData.taskCodeUpdateCacheKey)) {
       // Get the Task's taskChunks
       const allTasks = await utils.$dataCaller(
@@ -176,8 +176,8 @@ const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => 
         "/api/peth/get_plugin_tasks_by_key/" + taskMetaData.apiData.pluginKey
       );
       const currentTask = allTasks.find((task) => task.key === taskMetaData.taskKey);
-      devLog(`currentTask: ${JSON.stringify(currentTask)}`);
-      devLog(`\n\n\n\n\n\n`);
+      // devLog(`currentTask: ${JSON.stringify(currentTask)}`);
+      // devLog(`\n\n\n\n\n\n`);
       const taskConfig = currentTask.config;
       const taskChunks = currentTask.chunks;
       // logs.push({
