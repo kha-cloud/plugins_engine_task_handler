@@ -5,6 +5,7 @@ const kill = require('tree-kill');
 
 const archiveFolder = "/var/plugins_engine_tasks/archive";
 const tasksWorkDir = "/var/plugins_engine_tasks/work_dir";
+const tasksDevLogFile = "/var/plugins_engine_tasks/dev.log";
 
 const execute_PETH_runTask = async (workPath, pidCallback, isProduction = true) => {
   return new Promise((resolve, reject) => {
@@ -95,6 +96,13 @@ const execute_PETH_runTask = async (workPath, pidCallback, isProduction = true) 
   });
 }
 
+const devLog = (message) => {
+  if(!fs.existsSync(tasksDevLogFile)) {
+    fs.writeFileSync(tasksDevLogFile, "");
+  }
+  fs.appendFileSync(tasksDevLogFile, `${message}\n`);
+};
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => {
@@ -162,6 +170,9 @@ const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => 
         "/api/peth/get_plugin_tasks_by_key/" + taskMetaData.apiData.pluginKey
       );
       const currentTask = allTasks.find((task) => task.key === taskMetaData.taskKey);
+      devLog(`TIME: ${new Date()}`);
+      devLog(`currentTask: ${JSON.stringify(currentTask)}`);
+      devLog(`\n\n\n\n\n\n`);
       const taskConfig = currentTask.config;
       const taskChunks = currentTask.chunks;
       // logs.push({
