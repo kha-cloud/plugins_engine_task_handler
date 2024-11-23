@@ -389,7 +389,7 @@ const runTask = async (taskMetaData, isProduction = true, testModeData = {}) => 
     // Updating the task state WITHOUT WAITING
     utils.setCache(
       stateKey,
-      "finished",
+      (childError || isTimeout) ? "failed" : "finished",
       { group: "tasks-states-by-date-" + (new Date()).toISOString().slice(0, 10), }
     );
     
