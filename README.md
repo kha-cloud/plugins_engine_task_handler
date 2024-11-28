@@ -62,7 +62,8 @@ touch /var/plugins_engine_tasks/tasks_history.list
 ### 1- PETH Methods
 
 ```js
-const PETH = require("kha_plugins_engine_task_handler");
+const node_path = require('child_process').execSync('npm root -g').toString().trim();
+const PETH = require(node_path+"/kha_plugins_engine_task_handler");
 
 // Get current Task data
 PETH.getTaskData();
@@ -74,7 +75,8 @@ PETH.setTaskResult(TaskResult)
 ### 2- Utils Methods
 
 ```js
-const PETH = require("kha_plugins_engine_task_handler");
+const node_path = require('child_process').execSync('npm root -g').toString().trim();
+const PETH = require(node_path+"/kha_plugins_engine_task_handler");
 
 // $dataCaller | Get API data
 var data = await PETH.utils.$dataCaller("get", "@PA/get-data");

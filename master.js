@@ -9,9 +9,10 @@ const tasksDevLogFile = "/var/plugins_engine_tasks/dev.log";
 
 const execute_PETH_runTask = async (workPath, pidCallback, isProduction = true) => {
   return new Promise((resolve, reject) => {
-    const command = `
+    const command = /*js*/`
       (async () => {
-        const PETH = require('kha_plugins_engine_task_handler');
+        const node_path = require('child_process').execSync('npm root -g').toString().trim();
+        const PETH = require(node_path+'/kha_plugins_engine_task_handler');
         await PETH.init({
           isProduction: ${isProduction}
         });
